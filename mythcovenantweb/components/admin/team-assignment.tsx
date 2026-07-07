@@ -705,7 +705,7 @@ export function TeamAssignment() {
                       <span className="text-xs text-slate-500">·</span>
                       <span className="text-xs text-slate-400">{member.className}</span>
                     </div>
-                    <p className="mt-1 text-sm text-amber-200">Power {member.power}</p>
+                    
                   </div>
                 ))}
 
