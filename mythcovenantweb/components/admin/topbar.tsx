@@ -1,8 +1,19 @@
-import { Bell, Menu, Search } from "lucide-react";
+"use client";
+
+import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
 export function AdminTopbar() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Delete the authentication cookie
+    document.cookie = "admin_logged_in=; path=/; max-age=0";
+    router.replace("/login");
+  };
+
   return (
     <header className="border-b border-white/10 bg-slate-950/70 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -48,6 +59,16 @@ export function AdminTopbar() {
                 <p className="text-xs text-slate-400">Quản trị cấp cao</p>
               </div>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={handleLogout}
+              className="rounded-full border-red-500/20 bg-red-500/10 text-red-200 hover:bg-red-500/20"
+              title="Đăng xuất"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>

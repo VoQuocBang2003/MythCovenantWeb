@@ -2,7 +2,6 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase-client";
 
 export default function AdminLayout({
   children,
@@ -11,32 +10,18 @@ export default function AdminLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    // Check if logged in via cookie
+    const isLoggedIn = document.cookie
+      .split(";")
+      .find((cookie) => cookie.trim().startsWith("admin_logged_in="))
+      ?.split("=")[1];
 
-    const loadSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!mounted) return;
+    if (isLoggedIn !== "true") {
+      router.replace("/login");
+      return;
+    }
 
-      if (!data.session) {
-        router.replace("/login");
-        return;
-      }
-
-      setIsLoading(false);
-    };
-
-    loadSession();
-
-    const { data } = supabase.auth.onAuthStateChange((_, session) => {
-      if (!session) {
-        router.replace("/login");
-      }
-    });
-
-    return () => {
-      mounted = false;
-      data.subscription.unsubscribe();
-    };
+    setIsLoading(false);
   }, [router]);
 
   if (isLoading) {

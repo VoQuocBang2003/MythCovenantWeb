@@ -1,44 +1,30 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase-client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        router.replace("/admin");
-      }
-    });
-  }, [router]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
-    setMessage(null);
     setIsLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setIsLoading(false);
-
-    if (error) {
-      setError(error.message);
-      return;
+    // Simple authentication with fixed credentials
+    if (username === "admin" && password === "admin123") {
+      // Set cookie for authentication
+      document.cookie = "admin_logged_in=true; path=/; max-age=86400";
+      router.replace("/admin");
+    } else {
+      setError("Sai tài khoản hoặc mật khẩu");
     }
 
-    router.replace("/admin");
+    setIsLoading(false);
   };
 
   return (
@@ -54,14 +40,14 @@ export default function LoginPage() {
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-200">
-              Email
+            <label htmlFor="username" className="block text-sm font-medium text-slate-200">
+              Tên đăng nhập
             </label>
             <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              id="username"
+              type="text"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
               required
               className="mt-2 block w-full rounded-2xl border border-white/10 bg-slate-900/90 px-4 py-3 text-slate-100 shadow-sm outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
             />
@@ -84,12 +70,6 @@ export default function LoginPage() {
           {error ? (
             <p className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
               {error}
-            </p>
-          ) : null}
-
-          {message ? (
-            <p className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-              {message}
             </p>
           ) : null}
 
