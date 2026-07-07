@@ -3,6 +3,9 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { AdminSidebar } from "@/components/admin/sidebar";
+import { AdminTopbar } from "@/components/admin/topbar";
+
 export default function AdminLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
@@ -35,5 +38,15 @@ export default function AdminLayout({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(255,190,92,0.16),_transparent_34%),linear-gradient(135deg,_#060816_0%,_#111827_100%)] text-slate-50">
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col lg:flex-row">
+        <AdminSidebar />
+        <div className="flex-1">
+          <AdminTopbar />
+          <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+        </div>
+      </div>
+    </div>
+  );
 }
