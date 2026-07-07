@@ -3,11 +3,12 @@
 create table if not exists players (
   id uuid primary key default gen_random_uuid(),
   nickname text not null,
-  class_name text not null,
-  role text not null,
-  power int not null,
+  class text,
+  role text,
+  power int default 0,
   note text,
-  created_at timestamptz not null default now()
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
 create table if not exists layouts (
@@ -15,15 +16,15 @@ create table if not exists layouts (
   name text not null,
   description text,
   config jsonb not null,
-  created_at timestamptz not null default now()
+  created_at timestamptz default now()
 );
 
 create table if not exists team_assignments (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   assignments jsonb not null,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
 create function if not exists update_timestamp()

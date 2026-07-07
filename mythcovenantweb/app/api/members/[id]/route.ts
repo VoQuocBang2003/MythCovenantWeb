@@ -1,7 +1,32 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase-server";
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+type PlayerRow = {
+  id: string;
+  nickname: string;
+  class: string | null;
+  role: string | null;
+  power: number;
+  note: string | null;
+  created_at: string | null;
+};
+
+function mapToMember(item: PlayerRow) {
+  return {
+    id: item.id,
+    nickname: item.nickname,
+    className: item.class ?? "",
+    role: item.role ?? "Member",
+    power: item.power ?? 0,
+    note: item.note ?? "",
+    created_at: item.created_at,
+  };
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
   const body = await request.json();
   const nickname = String(body.nickname || "").trim();
@@ -16,27 +41,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { data, error } = await supabaseServer
     .from("players")
-    .update({ nickname, class_name: className, role, power, note })
+    .update({ nickname, class: className, role, power, note })
     .eq("id", id)
-    .select("id, nickname, class_name, role, power, note, created_at")
+    .select("id, nickname, class, role, power, note, created_at")
     .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({
-    id: data.id,
-    nickname: data.nickname,
-    className: data.class_name,
-    role: data.role,
-    power: data.power,
-    note: data.note,
-    created_at: data.created_at,
-  });
+  return NextResponse.json(mapToMember(data));
 }
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
 
   const { error } = await supabaseServer.from("players").delete().eq("id", id);
