@@ -6,9 +6,14 @@ import { read, utils, writeFile } from "xlsx";
 
 import { Button } from "@/components/ui/button";
 import { useAppFeedback } from "@/components/ui/feedback-provider";
-import { RoleBadge } from "@/components/ui/role-badge";
 import { playerClasses } from "@/lib/player-constants";
 import { getRoleBadgeClasses } from "@/lib/role-colors";
+import {
+  getPlayers,
+  createPlayer,
+  updatePlayer,
+  deletePlayer,
+} from "@/lib/playerRepository";
 import type { Member } from "@/types/member";
 
 const roleOptions = ["Member", "Leader", "Commander", "Tank", "DPS", "Healer", "Support"] as const;
@@ -79,16 +84,14 @@ export function MemberManagement() {
   useEffect(() => {
     const loadMembers = async () => {
       setIsLoading(true);
-      const response = await fetch("/api/members");
-
-      if (!response.ok) {
+      try {
+        const data = await getPlayers();
+        setMembers(data);
+      } catch {
+        // Error handled silently
+      } finally {
         setIsLoading(false);
-        return;
       }
-
-      const data = (await response.json()) as Member[];
-      setMembers(data);
-      setIsLoading(false);
     };
 
     void loadMembers();
@@ -213,18 +216,13 @@ export function MemberManagement() {
 
       const createdMembers: Member[] = [];
       for (const payload of payloads) {
-        const response = await fetch("/api/members", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+        const created = await createPlayer({
+          nickname: payload.nickname,
+          className: payload.className,
+          role: payload.role,
+          power: payload.power,
+          note: payload.note,
         });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.error ?? "Không thể tạo thành viên từ file.");
-        }
-
-        const created = (await response.json()) as Member;
         createdMembers.push(created);
       }
 
@@ -283,56 +281,39 @@ export function MemberManagement() {
       return;
     }
 
-    const payload = {
-      nickname: form.nickname.trim(),
-      className: form.className,
-      role: form.role,
-      power: form.power,
-      note: form.note.trim(),
-    };
-
-    if (editingMemberId) {
-      const response = await fetch(`/api/members/${editingMemberId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        setFeedback({ type: "error", message: errorData?.error ?? "Không thể cập nhật thành viên." });
-        setIsSubmitting(false);
-        toast({ title: "Cập nhật thất bại", description: errorData?.error ?? "Không thể cập nhật thành viên.", variant: "error" });
-        return;
+    try {
+      if (editingMemberId) {
+        const updated = await updatePlayer(editingMemberId, {
+          nickname: form.nickname.trim(),
+          className: form.className,
+          role: form.role,
+          power: form.power,
+          note: form.note.trim(),
+        });
+        setMembers((current) => current.map((member) => (member.id === updated.id ? updated : member)));
+        setFeedback({ type: "success", message: "Cập nhật thành viên thành công." });
+        toast({ title: "Cập nhật thành công", description: "Thông tin thành viên đã được lưu.", variant: "success" });
+      } else {
+        const created = await createPlayer({
+          nickname: form.nickname.trim(),
+          className: form.className,
+          role: form.role,
+          power: form.power,
+          note: form.note.trim(),
+        });
+        setMembers((current) => [created, ...current]);
+        setFeedback({ type: "success", message: "Tạo thành viên thành công." });
+        toast({ title: "Tạo thành viên thành công", description: "Thành viên mới đã được thêm vào hệ thống.", variant: "success" });
       }
 
-      const updated = (await response.json()) as Member;
-      setMembers((current) => current.map((member) => (member.id === updated.id ? updated : member)));
-      setFeedback({ type: "success", message: "Cập nhật thành viên thành công." });
-      toast({ title: "Cập nhật thành công", description: "Thông tin thành viên đã được lưu.", variant: "success" });
-    } else {
-      const response = await fetch("/api/members", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        setFeedback({ type: "error", message: errorData?.error ?? "Không thể tạo thành viên." });
-        setIsSubmitting(false);
-        toast({ title: "Tạo thất bại", description: errorData?.error ?? "Không thể tạo thành viên.", variant: "error" });
-        return;
-      }
-
-      const created = (await response.json()) as Member;
-      setMembers((current) => [created, ...current]);
-      setFeedback({ type: "success", message: "Tạo thành viên thành công." });
-      toast({ title: "Tạo thành viên thành công", description: "Thành viên mới đã được thêm vào hệ thống.", variant: "success" });
+      closeModal();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Không thể lưu thành viên.";
+      setFeedback({ type: "error", message });
+      toast({ title: "Lỗi", description: message, variant: "error" });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    closeModal();
-    setIsSubmitting(false);
   };
 
   const handleDelete = async (memberId: string) => {
@@ -348,14 +329,11 @@ export function MemberManagement() {
       return;
     }
 
-    const response = await fetch(`/api/members/${memberId}`, {
-      method: "DELETE",
-    });
-
-    if (response.ok) {
+    try {
+      await deletePlayer(memberId);
       setMembers((current) => current.filter((member) => member.id !== memberId));
       toast({ title: "Xóa thành công", description: "Thành viên đã được xóa khỏi danh sách.", variant: "success" });
-    } else {
+    } catch {
       toast({ title: "Xóa thất bại", description: "Không thể xóa thành viên lúc này.", variant: "error" });
     }
   };

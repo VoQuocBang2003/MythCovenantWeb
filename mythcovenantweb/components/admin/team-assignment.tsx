@@ -9,7 +9,13 @@ import { getRoleBadgeClasses } from "@/lib/role-colors";
 import { useNetworkStatus } from "@/hooks/use-network-status";
 import type { Member, TeamKey } from "@/types/member";
 import type { TeamAssignment as SavedLayout } from "@/types/team-assignment";
-import { initialMembers } from "@/lib/mock-members";
+import { getPlayers } from "@/lib/playerRepository";
+import {
+  getTeamAssignments,
+  createTeamAssignment,
+  updateTeamAssignment,
+  deleteTeamAssignment,
+} from "@/lib/teamAssignmentRepository";
 
 type TeamColumn = {
   id: TeamKey;
@@ -27,20 +33,8 @@ const columns: TeamColumn[] = [
   { id: "bench", title: "Bench", description: "Thành viên dự bị" },
 ];
 
-const baseMembers: Member[] = initialMembers.map((member) => ({ ...member }));
-
 const createEmptyMembersByColumn = (): Record<TeamKey, Member[]> => ({
   unassigned: [],
-  "team-1": [],
-  "team-2": [],
-  "team-3": [],
-  "team-4": [],
-  "team-5": [],
-  bench: [],
-});
-
-const createDefaultMembersByColumn = (): Record<TeamKey, Member[]> => ({
-  unassigned: [...baseMembers],
   "team-1": [],
   "team-2": [],
   "team-3": [],
@@ -53,7 +47,8 @@ const initialLayoutName = "Layout mới";
 const PENDING_SYNC_KEY = "team-assignment-pending-sync";
 
 export function TeamAssignment() {
-  const [membersByColumn, setMembersByColumn] = useState<Record<TeamKey, Member[]>>(createDefaultMembersByColumn());
+  const [members, setMembers] = useState<Member[]>([]);
+  const [membersByColumn, setMembersByColumn] = useState<Record<TeamKey, Member[]>>(createEmptyMembersByColumn());
   const [draggedMemberId, setDraggedMemberId] = useState<string | null>(null);
   const [layouts, setLayouts] = useState<SavedLayout[]>([]);
   const [activeLayoutId, setActiveLayoutId] = useState<string | null>(null);
@@ -86,7 +81,7 @@ export function TeamAssignment() {
   const buildMembersByColumn = useCallback((assignments: Record<TeamKey, string[]>) => {
     const result = createEmptyMembersByColumn();
 
-    baseMembers.forEach((member) => {
+    members.forEach((member) => {
       const matchedColumn = columns.find(
         (column) => column.id !== "unassigned" && assignments[column.id]?.includes(member.id)
       );
@@ -99,14 +94,14 @@ export function TeamAssignment() {
     });
 
     return result;
-  }, []);
+  }, [members]);
 
   const loadLayout = useCallback(
     (layout: SavedLayout | null) => {
       if (!layout) {
         setActiveLayoutId(null);
         setLayoutName(initialLayoutName);
-        setMembersByColumn(createDefaultMembersByColumn());
+        setMembersByColumn(createEmptyMembersByColumn());
         return;
       }
 
@@ -119,15 +114,9 @@ export function TeamAssignment() {
 
   const fetchLayouts = useCallback(async () => {
     try {
-      const response = await fetch("/api/team-assignments");
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.error ?? "Không thể tải layouts.");
-      }
-
-      setLayouts(Array.isArray(data) ? data : []);
-      return Array.isArray(data) ? data : [];
+      const data = await getTeamAssignments();
+      setLayouts(data);
+      return data;
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : String(error));
       return [];
@@ -170,6 +159,40 @@ export function TeamAssignment() {
     }
   }, []);
 
+  // Load members and layouts on mount
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setIsInitializing(true);
+      try {
+        const [loadedMembers, savedLayouts] = await Promise.all([
+          getPlayers(),
+          getTeamAssignments(),
+        ]);
+        setMembers(loadedMembers);
+        setLayouts(savedLayouts);
+        if (savedLayouts.length > 0) {
+          loadLayout(savedLayouts[0]);
+        } else {
+          setMembersByColumn(
+            loadedMembers.reduce(
+              (acc, member) => {
+                acc.unassigned.push(member);
+                return acc;
+              },
+              createEmptyMembersByColumn()
+            )
+          );
+        }
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : String(error));
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    void loadInitialData();
+  }, [loadLayout]);
+
   // Auto-sync when online
   useEffect(() => {
     if (isOnline && pendingSync) {
@@ -182,23 +205,20 @@ export function TeamAssignment() {
           }
 
           const payload = JSON.parse(pending);
-          const response = await fetch("/api/team-assignments", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+          const data = await createTeamAssignment({
+            name: payload.name,
+            assignments: payload.assignments,
           });
-
-          const data = await response.json();
-          if (response.ok) {
-            clearPendingFromStorage();
-            await fetchLayouts();
-            loadLayout(data);
-            toast({ 
-              title: "Đồng bộ thành công", 
-              description: "Dữ liệu đã được đồng bộ lên Supabase.", 
-              variant: "success" 
-            });
+          clearPendingFromStorage();
+          const savedLayouts = await fetchLayouts();
+          if (savedLayouts.length > 0) {
+            loadLayout(savedLayouts[0]);
           }
+          toast({ 
+            title: "Đồng bộ thành công", 
+            description: "Dữ liệu đã được đồng bộ lên Supabase.", 
+            variant: "success" 
+          });
         } catch {
           // Will retry when online again
         }
@@ -207,19 +227,6 @@ export function TeamAssignment() {
       void syncPending();
     }
   }, [isOnline, pendingSync, clearPendingFromStorage, fetchLayouts, loadLayout, toast]);
-
-  useEffect(() => {
-    const loadInitialLayouts = async () => {
-      setIsInitializing(true);
-      const savedLayouts = await fetchLayouts();
-      if (savedLayouts.length > 0) {
-        loadLayout(savedLayouts[0]);
-      }
-      setIsInitializing(false);
-    };
-
-    void loadInitialLayouts();
-  }, [fetchLayouts, loadLayout]);
 
   // Get assignments from members state
   const getAssignmentsFromMembers = useCallback((members: Record<TeamKey, Member[]>) => {
@@ -240,17 +247,15 @@ export function TeamAssignment() {
     if (isOnline) {
       setIsSaving(true);
       try {
-        const response = await fetch("/api/team-assignments", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data?.error ?? "Không thể lưu layout.");
-        }
-
+        const data = activeLayoutId
+          ? await updateTeamAssignment(activeLayoutId, {
+              name: payload.name,
+              assignments: payload.assignments,
+            })
+          : await createTeamAssignment({
+              name: payload.name,
+              assignments: payload.assignments,
+            });
         clearPendingFromStorage();
         await fetchLayouts();
         loadLayout(data);
@@ -309,7 +314,15 @@ export function TeamAssignment() {
     clearPendingFromStorage();
     setActiveLayoutId(null);
     setLayoutName(initialLayoutName);
-    setMembersByColumn(createDefaultMembersByColumn());
+    setMembersByColumn(
+      members.reduce(
+        (acc, member) => {
+          acc.unassigned.push(member);
+          return acc;
+        },
+        createEmptyMembersByColumn()
+      )
+    );
     toast({ title: "Đã tạo layout mới", description: "Bạn có thể bắt đầu sắp xếp team từ đầu.", variant: "info" });
   };
 
@@ -325,16 +338,15 @@ export function TeamAssignment() {
         ...(activeLayoutId ? { assignmentId: activeLayoutId } : {}),
       };
 
-      const response = await fetch("/api/team-assignments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error ?? "Không thể lưu layout.");
-      }
+      const data = activeLayoutId
+        ? await updateTeamAssignment(activeLayoutId, {
+            name: payload.name,
+            assignments: payload.assignments,
+          })
+        : await createTeamAssignment({
+            name: payload.name,
+            assignments: payload.assignments,
+          });
 
       clearPendingFromStorage();
       await fetchLayouts();
@@ -375,15 +387,7 @@ export function TeamAssignment() {
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/team-assignments/${activeLayoutId}`, {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error ?? "Không thể xóa layout.");
-      }
-
+      await deleteTeamAssignment(activeLayoutId);
       const savedLayouts = await fetchLayouts();
       if (savedLayouts.length > 0) {
         loadLayout(savedLayouts[0]);
