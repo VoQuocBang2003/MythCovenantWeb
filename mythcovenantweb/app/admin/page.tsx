@@ -5,34 +5,34 @@ import { Button } from "@/components/ui/button";
 const stats = [
   {
     title: "Thành viên hoạt động",
-    value: "128",
-    note: "+12% so với tuần trước",
+    value: "100",
+    note: "+0 so với tuần trước",
     icon: Users2,
   },
   {
     title: "Team đang vận hành",
     value: "06",
-    note: "2 team cần bổ sung nhân sự",
+    note: "3 công 3 thủ",
     icon: Crown,
   },
   {
     title: "Sự kiện hôm nay",
-    value: "14",
-    note: "3 sự kiện cần chú ý",
+    value: "không",
+    note: "chưa đặt ghi chú",
     icon: Flame,
   },
 ];
 
 const members = [
-  { name: "Linh Tâm", role: "Leader", status: "Online" },
-  { name: "Vân Nhi", role: "Support", status: "Focus" },
-  { name: "Thiên Long", role: "Strategist", status: "Away" },
+  { name: "Vinny", role: "Leader", status: "Online" },
+  { name: "Caroll", role: "Main Call", status: "Online" },
+  { name: "Kmaane", role: "Sleep", status: "Away" },
 ];
 
 const teams = [
-  { name: "Aether Guard", members: 18, focus: "Nhiệm vụ ngoại vi" },
-  { name: "Moonblade", members: 12, focus: "Đánh giá chiến thuật" },
-  { name: "Ember Rift", members: 9, focus: "Hỗ trợ event" },
+  { name: "Boss Guild", members: 10, focus: "19:00 - 21:00" },
+  { name: "Boss Tuần", members: 10, focus: "19:00 - 21:00" },
+  { name: "Sky Bond - Leo tháp", members: 10, focus: "21:00 - 23:00" },
 ];
 
 export default function AdminPage() {
@@ -43,18 +43,17 @@ export default function AdminPage() {
           <div className="max-w-2xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
               <Sparkles className="h-4 w-4" />
-              Phong cách Dark Fantasy cho admin panel
+              Myth Covenant - Team Management
             </div>
             <h3 className="text-3xl font-semibold text-white sm:text-4xl">
-              Theo dõi thế giới và điều phối đội ngũ một cách uyển chuyển.
+              MYTH COVENANT - Xếp team bang chiến
             </h3>
             <p className="mt-3 text-base text-slate-300">
-              Giao diện quản lý được thiết kế để vừa đẹp mắt vừa tối ưu cho
-              việc giám sát thành viên, phân chia team và quản lý cài đặt.
+              ...
             </p>
           </div>
           <Button className="rounded-full bg-amber-500 px-6 text-slate-950 hover:bg-amber-400">
-            Tạo sự kiện mới
+            ???
           </Button>
         </div>
       </section>

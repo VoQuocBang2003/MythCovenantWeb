@@ -31,9 +31,12 @@ export function AdminSidebar() {
             <Shield className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-amber-200/70">
-              Myth Covenant
-            </p>
+            <Link
+  href="/"
+  className="inline-block cursor-pointer text-xs uppercase tracking-[0.3em] text-amber-200/70 transition-all duration-200 hover:text-amber-300 hover:scale-105"
+>
+  Myth Covenant
+</Link>
             <p className="text-sm font-semibold text-white">Control Hall</p>
           </div>
         </div>

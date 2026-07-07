@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { FeedbackProvider } from "@/components/ui/feedback-provider";
-import "./globals.css";
+import "/globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Myth Covenant | Where Winds Meet",
   description:
-    "Một landing page hiện đại, tối giản và đầy phong cách game kiếm hiệp cho Myth Covenant.",
+    "lequocdinh siuuuuu",
 };
 
 export default function RootLayout({
