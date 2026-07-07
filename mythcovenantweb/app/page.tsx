@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ArrowRight,
   Compass,
@@ -80,13 +81,17 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button className="rounded-full bg-amber-500 px-6 text-slate-950 hover:bg-amber-400">
-                Khám phá hành trình
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="outline" className="rounded-full border-white/15 bg-white/5 text-white hover:bg-white/10">
-                Xem bản đồ thế giới
-              </Button>
+              <Link href="/login">
+                <Button className="rounded-full bg-amber-500 px-6 text-slate-950 hover:bg-amber-400">
+                  Khám phá hành trình
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/admin">
+                <Button variant="outline" className="rounded-full border-white/15 bg-white/5 text-white hover:bg-white/10">
+                  Xem bản đồ thế giới
+                </Button>
+              </Link>
             </div>
             <ul className="space-y-2 text-sm text-slate-300">
               {highlights.map((item) => (
