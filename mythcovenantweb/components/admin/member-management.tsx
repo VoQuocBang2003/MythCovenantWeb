@@ -339,10 +339,10 @@ export function MemberManagement() {
             Quản lý thành viên
           </p>
           <h3 className="mt-2 text-2xl font-semibold text-white">
-            Danh sách nhân vật trong covenant
+            Danh sách thành viên đăng ký bang chiến
           </h3>
           <p className="mt-2 text-sm text-slate-400">
-            Dữ liệu được lưu trực tiếp trên Supabase.
+            ---------------------------------------------
           </p>
         </div>
 
