@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +16,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     // Simple authentication with fixed credentials
-    if (username === "admin" && password === "admin123") {
+    if (email === "admin@gmail.com" && password === "admin123") {
       // Set cookie for authentication
       document.cookie = "admin_logged_in=true; path=/; max-age=86400";
       router.replace("/admin");
@@ -40,14 +40,14 @@ export default function LoginPage() {
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-slate-200">
-              Tên đăng nhập
+            <label htmlFor="email" className="block text-sm font-medium text-slate-200">
+              Email
             </label>
             <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               required
               className="mt-2 block w-full rounded-2xl border border-white/10 bg-slate-900/90 px-4 py-3 text-slate-100 shadow-sm outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
             />
