@@ -1,11 +1,15 @@
 import type { Member } from "@/types/member";
 
-export const memberClasses = [
-  "Swordmaster",
-  "Shadowblade",
-  "Warden",
-  "Cultivator",
-  "Invoker",
+export const playerClasses = [
+  "Vô Danh",
+  "Cửu Kiếm",
+  "Quạt dù công",
+  "Dù roi ném",
+  "Song đao",
+  "Quyền",
+  "Đại đao",
+  "Hoành đao",
+  "Quạt dù heal",
 ];
 
 export const initialMembers: Member[] = [

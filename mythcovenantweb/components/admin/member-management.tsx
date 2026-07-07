@@ -16,7 +16,7 @@ import {
 } from "@/lib/playerRepository";
 import type { Member } from "@/types/member";
 
-const roleOptions = ["Member", "Leader", "Commander", "Tank", "DPS", "Healer", "Support"] as const;
+const roleOptions = ["Member", "Leader", "Tank", "DPS", "Healer"] as const;
 
 type MemberRole = (typeof roleOptions)[number];
 
@@ -37,10 +37,6 @@ const normalizeRole = (value: string): MemberRole => {
     return "Leader";
   }
 
-  if (normalized === "commander") {
-    return "Commander";
-  }
-
   if (normalized === "tank") {
     return "Tank";
   }
@@ -53,10 +49,7 @@ const normalizeRole = (value: string): MemberRole => {
     return "Healer";
   }
 
-  if (normalized === "support") {
-    return "Support";
-  }
-
+  
   return "Member";
 };
 
@@ -563,7 +556,7 @@ export function MemberManagement() {
                     onChange={(event) =>
                       setForm((current) => ({ ...current, className: event.target.value }))
                     }
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-white outline-none"
+                    className="w-full rounded-2xl border border-gray-700 bg-black px-3 py-2 text-white outline-none"
                   >
                     {playerClasses.map((className) => (
                       <option key={className} value={className}>

@@ -25,12 +25,12 @@ type TeamColumn = {
 
 const columns: TeamColumn[] = [
   { id: "unassigned", title: "Chưa xếp", description: "Danh sách thành viên chưa phân bố" },
-  { id: "team-1", title: "Team 1", description: "Đội hình chính" },
-  { id: "team-2", title: "Team 2", description: "Đội hình phụ" },
-  { id: "team-3", title: "Team 3", description: "Đội hình chiến thuật" },
-  { id: "team-4", title: "Team 4", description: "Đội hình hỗ trợ" },
-  { id: "team-5", title: "Team 5", description: "Đội hình dự phòng" },
-  { id: "bench", title: "Bench", description: "Thành viên dự bị" },
+  { id: "team-1", title: "Công 1", description: "Công Trái" },
+  { id: "team-2", title: "Công 2", description: "Công Giữa" },
+  { id: "team-3", title: "Công 3", description: "Công Phải" },
+  { id: "team-4", title: "Thủ 1", description: "Thủ 1" },
+  { id: "team-5", title: "Thủ 2", description: "Thủ 2" },
+  { id: "bench", title: "Thủ 3", description: "Thủ 3" },
 ];
 
 const createEmptyMembersByColumn = (): Record<TeamKey, Member[]> => ({
@@ -465,12 +465,12 @@ export function TeamAssignment() {
       <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-[0_0_80px_rgba(0,0,0,0.25)]">
         <div className="mb-6 grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
           <div>
-            <p className="text-sm uppercase tracking-[0.35em] text-amber-200/70">Layout quản lý</p>
+            <p className="text-sm uppercase tracking-[0.35em] text-amber-200/70">Xếp team</p>
             <h3 className="mt-2 text-2xl font-semibold text-white">
               Lưu và quản lý cách chia Team
             </h3>
             <p className="mt-2 text-sm text-slate-400">
-              Mỗi layout sẽ lưu toàn bộ cách phân bố hiện tại của các team lên Supabase.
+              ...
             </p>
           </div>
 

@@ -1,7 +1,11 @@
 export const playerClasses = [
-  "Swordmaster",
-  "Shadowblade",
-  "Warden",
-  "Cultivator",
-  "Invoker",
+  "Vô Danh",
+  "Cửu Kiếm",
+  "Quạt dù công",
+  "Dù roi ném",
+  "Song đao",
+  "Quyền",
+  "Đại đao",
+  "Hoành đao",
+  "Quạt dù heal",
 ];
