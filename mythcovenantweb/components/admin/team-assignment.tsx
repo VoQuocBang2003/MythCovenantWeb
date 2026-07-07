@@ -616,51 +616,51 @@ export function TeamAssignment() {
       ) : (
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         <section className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5 transition duration-200 hover:border-amber-400/20">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h4 className="text-lg font-semibold text-white">Chưa xếp</h4>
-              <p className="text-sm text-slate-400">
-                {totals.unassigned.count} thành viên còn chưa phân bổ
-              </p>
-            </div>
-            <div className="rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
-              {totals.unassigned.count} người
-            </div>
-          </div>
+  <div className="mb-4 flex items-center justify-between">
+    <div>
+      <h4 className="text-lg font-semibold text-white">Chưa xếp</h4>
+      <p className="text-sm text-slate-400">
+        {totals.unassigned.count} thành viên còn chưa phân bổ
+      </p>
+    </div>
+    <div className="rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
+      {totals.unassigned.count} người
+    </div>
+  </div>
 
-          <div
-            className="min-h-[240px] rounded-[1.5rem] border border-dashed border-white/10 bg-white/5 p-3"
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={() => onDrop("unassigned")}
-          >
-            {membersByColumn.unassigned.map((member) => (
-              <div
-                key={member.id}
-                draggable
-                onDragStart={() => setDraggedMemberId(member.id)}
-                onDragEnd={() => setDraggedMemberId(null)}
-                className="mb-3 flex cursor-grab items-center justify-between rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-3 transition duration-200 hover:-translate-y-0.5 hover:border-amber-400/20"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-amber-500/10 p-2 text-amber-300">
-                    <GripVertical className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-white">{member.nickname}</p>
-                    <p className="text-sm text-slate-400">{member.className}</p>
-                  </div>
-                </div>
-                <span className="text-sm text-amber-200">{member.power}</span>
-              </div>
-            ))}
-
-            {membersByColumn.unassigned.length === 0 && (
-              <div className="flex h-full items-center justify-center text-sm text-slate-400">
-                Không còn thành viên chưa xếp.
-              </div>
-            )}
+  <div
+    className="h-[700px] overflow-y-auto rounded-[1.5rem] border border-dashed border-white/10 bg-white/5 p-3 pr-2"
+    onDragOver={(event) => event.preventDefault()}
+    onDrop={() => onDrop("unassigned")}
+  >
+    {membersByColumn.unassigned.map((member) => (
+      <div
+        key={member.id}
+        draggable
+        onDragStart={() => setDraggedMemberId(member.id)}
+        onDragEnd={() => setDraggedMemberId(null)}
+        className="mb-3 flex cursor-grab items-center justify-between rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-3 transition duration-200 hover:-translate-y-0.5 hover:border-amber-400/20"
+      >
+        <div className="flex items-center gap-3">
+          <div className="rounded-full bg-amber-500/10 p-2 text-amber-300">
+            <GripVertical className="h-4 w-4" />
           </div>
-        </section>
+          <div>
+            <p className="font-medium text-white">{member.nickname}</p>
+            <p className="text-sm text-slate-400">{member.className}</p>
+          </div>
+        </div>
+        <span className="text-sm text-amber-200">{member.power}</span>
+      </div>
+    ))}
+
+    {membersByColumn.unassigned.length === 0 && (
+      <div className="flex h-full items-center justify-center text-sm text-slate-400">
+        Không còn thành viên chưa xếp.
+      </div>
+    )}
+  </div>
+</section>
 
         <section className="grid gap-4 md:grid-cols-2">
           {columns.filter((column) => column.id !== "unassigned").map((column) => (
