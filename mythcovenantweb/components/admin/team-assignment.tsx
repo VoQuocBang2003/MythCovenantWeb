@@ -171,7 +171,24 @@ export function TeamAssignment() {
         setMembers(loadedMembers);
         setLayouts(savedLayouts);
         if (savedLayouts.length > 0) {
-          loadLayout(savedLayouts[0]);
+          const firstLayout = savedLayouts[0];
+          setActiveLayoutId(firstLayout.id);
+          setLayoutName(firstLayout.name);
+          
+          // Phân bổ thành viên vào các nhóm cục bộ dựa trên layout đầu tiên
+          const assignments = firstLayout.assignments;
+          const result = createEmptyMembersByColumn();
+          loadedMembers.forEach((member) => {
+            const matchedColumn = columns.find(
+              (column) => column.id !== "unassigned" && assignments[column.id]?.includes(member.id)
+            );
+            if (matchedColumn) {
+              result[matchedColumn.id].push(member);
+            } else {
+              result.unassigned.push(member);
+            }
+          });
+          setMembersByColumn(result);
         } else {
           setMembersByColumn(
             loadedMembers.reduce(
@@ -191,7 +208,8 @@ export function TeamAssignment() {
     };
 
     void loadInitialData();
-  }, [loadLayout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-sync when online
   useEffect(() => {
