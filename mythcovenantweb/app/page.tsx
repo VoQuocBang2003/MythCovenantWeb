@@ -73,9 +73,14 @@ export default function Home() {
               <h2 className="max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">
                 Welcome to the world of Myth Covenant, where winds meet and stories unfold.
               </h2>
-              <p className="max-w-xl text-lg text-slate-300 sm:text-xl">
-                Official discord: https://discord.gg/EhEe7MrhX 
-              </p>
+              <a
+  href="https://discord.gg/EhEe7MrhX"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 rounded-xl border border-indigo-500 bg-indigo-600/90 px-6 py-3 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-indigo-500"
+>
+  🎮 Join Official Discord
+</a>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href="/login">
