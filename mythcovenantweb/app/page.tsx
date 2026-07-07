@@ -15,28 +15,28 @@ import { Button } from "@/components/ui/button";
 const features = [
   {
     icon: ShieldCheck,
-    title: "Bảo hộ linh hồn",
+    title: "Tổ đội leo tháp",
     description:
-      "Hệ thống nhiệm vụ và lời khuyên được thiết kế để giữ cho hành trình của bạn luôn mạch lạc và đầy cảm hứng.",
+      "Luôn có các master speedrun hỗ trợ",
   },
   {
     icon: Sword,
-    title: "Đòn đánh thần thánh",
+    title: "Boss Guild Boss Tuần",
     description:
-      "Giao diện sáng bóng, hiệu ứng chuyển động nhẹ và bố cục tối ưu cho thiết bị di động và màn hình lớn.",
+      "19:00 - 21:00 hàng ngày",
   },
   {
     icon: Compass,
-    title: "La bàn kỳ ảo",
+    title: "Tận tâm hướng dẫn",
     description:
-      "Tìm thấy những ngõ hầm, bí cảnh và câu chuyện mới một cách tự nhiên trong mỗi trang chi tiết.",
+      "Định hướng võ học, hướng dẫn tất tần tật từ A-Z cho newbie",
   },
 ];
 
 const highlights = [
-  "Tối ưu cho trải nghiệm dark mode",
-  "Phong cách game kiếm hiệp và huyền ảo",
-  "Sẵn sàng mở rộng cho nội dung tương tác",
+  "Se duyên kết nghĩa PNS",
+  "GA - phát thưởng hàng tháng cho các thành viên tích cực",
+  "Phần thưởng thẻ tháng, battle pass, skin 60-1280 ngọc",
 ];
 
 export default function Home() {
@@ -59,7 +59,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <MoonStar className="h-4 w-4" />
-            Dark theme ready
+            Dark theme
           </div>
         </header>
 
@@ -67,29 +67,26 @@ export default function Home() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
               <Flame className="h-4 w-4" />
-              Bản giao diện mới cho mùa xuân của các huyền thoại
+              Bản quyền sử dụng thuộc về Myth Covenant
             </div>
             <div className="space-y-4">
               <h2 className="max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">
-                Khởi đầu một hành trình kiếm hiệp trong một thế giới đầy mây và
-                lửa.
+                Welcome to the world of Myth Covenant, where winds meet and stories unfold.
               </h2>
               <p className="max-w-xl text-lg text-slate-300 sm:text-xl">
-                Myth Covenant mang đến một nền tảng đậm chất huyền ảo với giao
-                diện tối, hiện đại và đầy cảm xúc, sẵn sàng trở thành nơi kể
-                chuyện của bạn.
+                Official discord: https://discord.gg/EhEe7MrhX 
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href="/login">
                 <Button className="rounded-full bg-amber-500 px-6 text-slate-950 hover:bg-amber-400">
-                  Khám phá hành trình
+                  Quản lý bang chiến
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/admin">
                 <Button variant="outline" className="rounded-full border-white/15 bg-white/5 text-white hover:bg-white/10">
-                  Xem bản đồ thế giới
+                  lequocdinh
                 </Button>
               </Link>
             </div>
@@ -106,7 +103,7 @@ export default function Home() {
           <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-800 p-6 shadow-inner">
             <div className="flex items-center justify-between">
               <span className="text-sm uppercase tracking-[0.3em] text-slate-400">
-                Trạng thái biểu đồ
+                Thông tin GUILD
               </span>
               <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-sm text-emerald-300">
                 Online
@@ -114,19 +111,19 @@ export default function Home() {
             </div>
             <div className="mt-6 space-y-4">
               <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-4">
-                <p className="text-sm text-slate-400">Sứ mệnh hôm nay</p>
+                <p className="text-sm text-slate-400">Official name</p>
                 <p className="mt-2 text-xl font-semibold text-white">
-                  Dẫn dắt người chơi qua mê cung gió và lửa.
+                  Myth Covenant | ID: 10078114
                 </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-slate-400">Cường hóa</p>
-                  <p className="mt-2 text-2xl font-semibold text-white">+12%</p>
+                  <p className="text-sm text-slate-400">Xu hướng</p>
+                  <p className="mt-2 text-2xl font-semibold text-white">PvP | PvE</p>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-slate-400">Tín hiệu</p>
-                  <p className="mt-2 text-2xl font-semibold text-white">3/3</p>
+                  <p className="text-sm text-slate-400">Xếp hạng GW</p>
+                  <p className="mt-2 text-2xl font-semibold text-white">Jesting God</p>
                 </div>
               </div>
             </div>
