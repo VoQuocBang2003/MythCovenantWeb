@@ -1,6 +1,7 @@
 import { Activity, Crown, Flame, Sparkles, Users2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { getRoleIcon } from "@/lib/role-icons";
 
 const stats = [
   {
@@ -38,7 +39,7 @@ const teams = [
 export default function AdminPage() {
   return (
     <div className="space-y-6">
-<section className="rounded-[2rem] border border-amber-400/20 bg-slate-900/80 p-6 shadow-[0_0_80px_rgba(0,0,0,0.3)]">
+ <section className="rounded-[2rem] border border-amber-400/20 bg-slate-900/80 p-6 shadow-[0_0_80px_rgba(0,0,0,0.3)]">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
@@ -94,9 +95,9 @@ export default function AdminPage() {
                 key={member.name}
                 className="flex items-center justify-between rounded-2xl border border-amber-400/20 bg-white/5 px-4 py-3 transition hover:border-amber-400/40"
               >
-                <div>
+                <div className="flex items-center gap-2">
                   <p className="font-medium text-white">{member.name}</p>
-                  <p className="text-sm text-slate-300">{member.role}</p>
+                  <span className="text-sm">{getRoleIcon(member.role)}</span>
                 </div>
                 <span className="rounded-full border border-emerald-400/30 bg-emerald-400/15 px-3 py-1 text-sm text-emerald-200">
                   {member.status}

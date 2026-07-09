@@ -7,30 +7,29 @@ import { read, utils, writeFile } from "xlsx";
 import { Button } from "@/components/ui/button";
 import { useAppFeedback } from "@/components/ui/feedback-provider";
 import { playerClasses } from "@/lib/player-constants";
-import { getRoleBadgeClasses } from "@/lib/role-colors";
+import { getRoleBadgeClasses, leaderHighlightClasses } from "@/lib/role-colors";
+import { allRoles, getRoleIcon, hasRole } from "@/lib/role-icons";
 import {
   getPlayers,
   createPlayer,
   updatePlayer,
   deletePlayer,
 } from "@/lib/playerRepository";
-import type { Member } from "@/types/member";
+import type { Member, RoleType } from "@/types/member";
 
-const roleOptions = ["Member", "Leader", "Tank", "DPS", "Healer"] as const;
-
-type MemberRole = (typeof roleOptions)[number];
+const roleOptions: RoleType[] = [...allRoles];
 
 const emptyForm: Omit<Member, "id" | "created_at"> = {
   nickname: "",
   className: playerClasses[0],
-  role: "Member",
+  role: '["Member"]',
   power: 0,
   note: "",
 };
 
 const normalizeNickname = (value: string) => value.trim().toLowerCase();
 
-const normalizeRole = (value: string): MemberRole => {
+const normalizeRole = (value: string): RoleType => {
   const normalized = value.trim().toLowerCase();
 
   if (normalized === "leader") {
@@ -49,8 +48,25 @@ const normalizeRole = (value: string): MemberRole => {
     return "Healer";
   }
 
-  
+  if (normalized === "flex") {
+    return "Flex";
+  }
+
   return "Member";
+};
+
+const parseRoles = (roleString: string): RoleType[] => {
+  try {
+    const parsed = JSON.parse(roleString);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((r): r is RoleType => 
+        allRoles.includes(r)
+      );
+    }
+    return [roleString as RoleType];
+  } catch {
+    return [roleString as RoleType];
+  }
 };
 
 const resolveCellValue = (row: Record<string, unknown>, candidates: string[]) => {
@@ -125,13 +141,15 @@ export function MemberManagement() {
 
   const openEditModal = (member: Member) => {
     setEditingMemberId(member.id);
+    const currentRoles = parseRoles(member.role);
     setForm({
       nickname: member.nickname,
       className: member.className,
-      role: normalizeRole(member.role),
+      role: JSON.stringify(currentRoles),
       power: member.power,
       note: member.note,
     });
+    setFeedback(null);
     setIsModalOpen(true);
   };
 
@@ -139,6 +157,31 @@ export function MemberManagement() {
     setIsModalOpen(false);
     setEditingMemberId(null);
     setForm(emptyForm);
+  };
+
+  const handleRoleToggle = (role: RoleType) => {
+    const currentRoles = parseRoles(form.role);
+    
+    if (currentRoles.includes(role)) {
+      // Remove role (but keep at least Member)
+      const newRoles = currentRoles.filter((r) => r !== role);
+      if (newRoles.length === 0) {
+        setForm((current) => ({ ...current, role: JSON.stringify(["Member"]) }));
+      } else {
+        setForm((current) => ({ ...current, role: JSON.stringify(newRoles) }));
+      }
+    } else {
+      // Add role (max 3)
+      if (currentRoles.length >= 3) {
+        toast({ 
+          title: "Giới hạn vai trò", 
+          description: "Mỗi thành viên chỉ được chọn tối đa 3 vai trò.", 
+          variant: "info" 
+        });
+        return;
+      }
+      setForm((current) => ({ ...current, role: JSON.stringify([...currentRoles, role]) }));
+    }
   };
 
   const handleImportMembers = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,7 +240,7 @@ export function MemberManagement() {
         payloads.push({
           nickname,
           className,
-          role,
+          role: JSON.stringify([role]),
           power,
           note: resolveCellValue(row, ["note", "ghi chú", "ghi_chu"]).trim(),
         });
@@ -442,68 +485,81 @@ export function MemberManagement() {
         </div>
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          {filteredMembers.map((member) => (
-            <article
-              key={member.id}
-              className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-[0_0_30px_rgba(0,0,0,0.15)] transition duration-200 hover:-translate-y-1 hover:border-amber-400/20"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-200">
-                    <Shield className="h-5 w-5" />
+          {filteredMembers.map((member) => {
+            const currentRoles = parseRoles(member.role);
+            const isLeaderMember = hasRole(member.role, "Leader");
+            
+            return (
+              <article
+                key={member.id}
+                className={`rounded-[1.75rem] border p-5 shadow-[0_0_30px_rgba(0,0,0,0.15)] transition duration-200 hover:-translate-y-1 ${
+                  isLeaderMember 
+                    ? `${leaderHighlightClasses.border} ${leaderHighlightClasses.background} ${leaderHighlightClasses.glow}` 
+                    : "border-white/10 bg-white/5 hover:border-amber-400/20"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-200">
+                      <Shield className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h4 className={`text-lg font-semibold ${isLeaderMember ? leaderHighlightClasses.name : "text-white"}`}>
+                        {member.nickname}
+                      </h4>
+                      <p className="text-sm text-slate-400">{member.className}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-lg font-semibold text-white">
-                      {member.nickname}
-                    </h4>
-                    <p className="text-sm text-slate-400">{member.className}</p>
+
+                  <div className="rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
+                    Power {member.power}
                   </div>
                 </div>
 
-                <div className="rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
-                  Power {member.power}
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                      Role
+                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1">
+                      {currentRoles.filter(r => r !== "Member").map((role) => (
+                        <span key={role} className={`text-xs ${getRoleBadgeClasses(role)}`}>
+                          {getRoleIcon(role)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                      Ghi chú
+                    </p>
+                    <p className="mt-1 text-sm text-slate-300">{member.note}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-                  <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                    Role
-                  </p>
-                  <span className={`mt-1 inline-block px-2.5 py-0.5 text-sm font-medium ${getRoleBadgeClasses(member.role)}`}>
-                    {member.role}
-                  </span>
+                <div className="mt-5 flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-full border-white/10 bg-white/5 text-white hover:bg-white/10"
+                    onClick={() => openEditModal(member)}
+                  >
+                    <PencilLine className="mr-2 h-4 w-4" />
+                    Sửa
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-full border-rose-400/20 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
+                    onClick={() => handleDelete(member.id)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Xóa
+                  </Button>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-                  <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                    Ghi chú
-                  </p>
-                  <p className="mt-1 text-sm text-slate-300">{member.note}</p>
-                </div>
-              </div>
-
-              <div className="mt-5 flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="rounded-full border-white/10 bg-white/5 text-white hover:bg-white/10"
-                  onClick={() => openEditModal(member)}
-                >
-                  <PencilLine className="mr-2 h-4 w-4" />
-                  Sửa
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="rounded-full border-rose-400/20 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
-                  onClick={() => handleDelete(member.id)}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Xóa
-                </Button>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
 
@@ -569,25 +625,24 @@ export function MemberManagement() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="text-sm text-slate-300">
-                  <span className="mb-2 block">Vai trò</span>
+                  <span className="mb-2 block">Vai trò (tối đa 3)</span>
                   <div className="flex flex-wrap gap-2">
                     {roleOptions.map((roleOption) => {
-                      const isActive = form.role === roleOption;
+                      const currentRoles = parseRoles(form.role);
+                      const isActive = currentRoles.includes(roleOption);
                       const roleStyles = getRoleBadgeClasses(roleOption);
                       return (
                         <button
                           key={roleOption}
                           type="button"
-                          onClick={() =>
-                            setForm((current) => ({ ...current, role: roleOption }))
-                          }
+                          onClick={() => handleRoleToggle(roleOption)}
                           className={`rounded-full border px-3 py-2 text-sm transition ${
                             isActive
                               ? `${roleStyles} ring-2 ring-amber-400/40`
                               : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                           }`}
                         >
-                          {roleOption === "Member" ? "Member" : `👑 ${roleOption}`}
+                          {getRoleIcon(roleOption)}
                         </button>
                       );
                     })}

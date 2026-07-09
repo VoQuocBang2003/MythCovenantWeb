@@ -6,7 +6,9 @@ import { utils, writeFile } from "xlsx";
 
 import { TeamOverviewModal } from "./team-overview-modal";
 import { useAppFeedback } from "@/components/ui/feedback-provider";
-import { getRoleBadgeClasses } from "@/lib/role-colors";
+import { leaderHighlightClasses } from "@/lib/role-colors";
+import { hasRole } from "@/lib/role-icons";
+import { RenderRoleIcons } from "@/components/ui/role-icon";
 import { useNetworkStatus } from "@/hooks/use-network-status";
 import type { Member, TeamKey } from "@/types/member";
 import type { TeamAssignment as SavedLayout } from "@/types/team-assignment";
@@ -209,7 +211,7 @@ export function TeamAssignment() {
       }
     };
 
-  void loadInitialData();
+    void loadInitialData();
   }, []);
 
   // Auto-sync when online
@@ -629,111 +631,128 @@ export function TeamAssignment() {
           ))}
         </div>
       ) : (
-       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-         <section className="xl:sticky xl:top-6 xl:self-start rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5 transition duration-200 hover:border-amber-400/20">
-   <div className="mb-4 flex items-center justify-between">
-     <div>
-       <h4 className="text-lg font-semibold text-white">Chưa xếp</h4>
-       <p className="text-sm text-slate-400">
-         {totals.unassigned.count} thành viên còn chưa phân bổ
-       </p>
-     </div>
-     <div className="rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
-       {totals.unassigned.count} người
-     </div>
-   </div>
+        <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+          <section className="xl:sticky xl:top-6 xl:self-start rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5 transition duration-200 hover:border-amber-400/20">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-semibold text-white">Chưa xếp</h4>
+                <p className="text-sm text-slate-400">
+                  {totals.unassigned.count} thành viên còn chưa phân bổ
+                </p>
+              </div>
+              <div className="rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
+                {totals.unassigned.count} người
+              </div>
+            </div>
 
-   <div
-     className="max-h-[calc(100vh-120px)] overflow-y-auto rounded-[1.5rem] border border-dashed border-white/10 bg-white/5 p-3 pr-2"
-     onDragOver={(event) => event.preventDefault()}
-     onDrop={() => onDrop("unassigned")}
-   >
-     {membersByColumn.unassigned.map((member) => (
-       <div
-         key={member.id}
-         draggable
-         onDragStart={() => setDraggedMemberId(member.id)}
-         onDragEnd={() => setDraggedMemberId(null)}
-         className="mb-3 flex cursor-grab items-center justify-between rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-3 transition duration-200 hover:-translate-y-0.5 hover:border-amber-400/20"
-       >
-         <div className="flex items-center gap-3">
-           <div className="rounded-full bg-amber-500/10 p-2 text-amber-300">
-             <GripVertical className="h-4 w-4" />
-           </div>
-           <div>
-             <p className="font-medium text-white">{member.nickname}</p>
-             <p className="text-sm text-slate-400">{member.className}</p>
-           </div>
-         </div>
-         <span className="text-sm text-amber-200">{member.power}</span>
-       </div>
-     ))}
-
-     {membersByColumn.unassigned.length === 0 && (
-       <div className="flex h-full items-center justify-center text-sm text-slate-400">
-         Không còn thành viên chưa xếp.
-       </div>
-     )}
-   </div>
- </section>
-
-        <section className="grid gap-4 md:grid-cols-2">
-          {columns.filter((column) => column.id !== "unassigned").map((column) => (
             <div
-              key={column.id}
-              className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-amber-400/20"
+              className="max-h-[calc(100vh-120px)] overflow-y-auto rounded-[1.5rem] border border-dashed border-white/10 bg-white/5 p-3 pr-2"
               onDragOver={(event) => event.preventDefault()}
-              onDrop={() => onDrop(column.id as TeamKey)}
+              onDrop={() => onDrop("unassigned")}
             >
-<div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h4 className="text-lg font-semibold text-white">{column.title}</h4>
-                  <p className="text-sm text-slate-400">{column.description}</p>
-                </div>
-                <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-300">
-                  {totals[column.id as TeamKey].count} / {totals[column.id as TeamKey].power}
-                </div>
-              </div>
-
-              <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-400">
-                <span className="flex items-center gap-2">
-                  <Users2 className="h-4 w-4 text-amber-300" />
-                  {totals[column.id as TeamKey].count} thành viên
-                </span>
-                <span className="text-amber-200">Tổng Power {totals[column.id as TeamKey].power}</span>
-              </div>
-
-              <div className="min-h-[180px] rounded-[1.5rem] border border-white/10 bg-slate-900/50 p-3">
-                {membersByColumn[column.id as TeamKey].map((member) => (
+              {membersByColumn.unassigned.map((member) => {
+                const isLeaderMember = hasRole(member.role, "Leader");
+                
+                return (
                   <div
                     key={member.id}
                     draggable
                     onDragStart={() => setDraggedMemberId(member.id)}
                     onDragEnd={() => setDraggedMemberId(null)}
-                    className="mb-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 transition duration-200 hover:-translate-y-0.5 hover:border-amber-400/20"
+                    className={`mb-3 flex cursor-grab items-center justify-between rounded-2xl border px-3 py-3 transition duration-200 hover:-translate-y-0.5 ${
+                      isLeaderMember 
+                        ? `${leaderHighlightClasses.border} ${leaderHighlightClasses.background}` 
+                        : "border-white/10 hover:border-amber-400/20"
+                    }`}
                   >
-                    <p className="font-medium text-white">{member.nickname}</p>
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className={`text-xs ${getRoleBadgeClasses(member.role)}`}>
-                        {member.role}
-                      </span>
-                      <span className="text-xs text-slate-500">·</span>
-                      <span className="text-xs text-slate-400">{member.className}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-full bg-amber-500/10 p-2 text-amber-300">
+                        <GripVertical className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className={`font-medium ${isLeaderMember ? leaderHighlightClasses.name : "text-white"}`}>{member.nickname}</p>
+                        <p className="text-sm text-slate-400">{member.className}</p>
+                      </div>
                     </div>
-                    
+                    <div className="flex items-center gap-2">
+                      <RenderRoleIcons roles={member.role} />
+                      <span className="text-sm text-amber-200">{member.power}</span>
+                    </div>
                   </div>
-                ))}
+                );
+              })}
 
-                {membersByColumn[column.id as TeamKey].length === 0 && (
-                  <div className="flex h-full items-center justify-center text-sm text-slate-500">
-                    Thả thành viên vào đây
-                  </div>
-                )}
-              </div>
+              {membersByColumn.unassigned.length === 0 && (
+                <div className="flex h-full items-center justify-center text-sm text-slate-400">
+                  Không còn thành viên chưa xếp.
+                </div>
+              )}
             </div>
-          ))}
-        </section>
-      </div>
+          </section>
+
+          <section className="grid gap-4 md:grid-cols-2">
+            {columns.filter((column) => column.id !== "unassigned").map((column) => (
+              <div
+                key={column.id}
+                className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-amber-400/20"
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => onDrop(column.id as TeamKey)}
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h4 className="text-lg font-semibold text-white">{column.title}</h4>
+                    <p className="text-sm text-slate-400">{column.description}</p>
+                  </div>
+                  <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-300">
+                    {totals[column.id as TeamKey].count} / {totals[column.id as TeamKey].power}
+                  </div>
+                </div>
+
+                <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-400">
+                  <span className="flex items-center gap-2">
+                    <Users2 className="h-4 w-4 text-amber-300" />
+                    {totals[column.id as TeamKey].count} thành viên
+                  </span>
+                  <span className="text-amber-200">Tổng Power {totals[column.id as TeamKey].power}</span>
+                </div>
+
+                <div className="min-h-[180px] rounded-[1.5rem] border border-white/10 bg-slate-900/50 p-3">
+                  {membersByColumn[column.id as TeamKey].map((member) => {
+                    const isLeaderMember = hasRole(member.role, "Leader");
+                    
+                    return (
+                      <div
+                        key={member.id}
+                        draggable
+                        onDragStart={() => setDraggedMemberId(member.id)}
+                        onDragEnd={() => setDraggedMemberId(null)}
+                        className={`mb-3 rounded-2xl border px-3 py-3 transition duration-200 hover:-translate-y-0.5 ${
+                          isLeaderMember 
+                            ? `${leaderHighlightClasses.border} ${leaderHighlightClasses.background}` 
+                            : "border-white/10 hover:border-amber-400/20"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className={`font-medium ${isLeaderMember ? leaderHighlightClasses.name : "text-white"}`}>
+                            {member.nickname}
+                          </p>
+                          <RenderRoleIcons roles={member.role} />
+                        </div>
+                        <p className="mt-1 text-xs text-slate-400">{member.className}</p>
+                      </div>
+                    );
+                  })}
+
+                  {membersByColumn[column.id as TeamKey].length === 0 && (
+                    <div className="flex h-full items-center justify-center text-sm text-slate-500">
+                      Thả thành viên vào đây
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </section>
+        </div>
       )}
 
       {/* Team Overview Modal */}

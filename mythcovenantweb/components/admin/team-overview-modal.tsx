@@ -3,6 +3,9 @@
 import { X } from "lucide-react";
 import type { TeamKey } from "@/types/member";
 import type { Member } from "@/types/member";
+import { hasRole } from "@/lib/role-icons";
+import { leaderHighlightClasses } from "@/lib/role-colors";
+import { RenderRoleIcons } from "@/components/ui/role-icon";
 
 interface TeamOverviewModalProps {
   isOpen: boolean;
@@ -18,19 +21,6 @@ const teamColumns: { id: TeamKey; title: string }[] = [
   { id: "team-5", title: "Thủ 2" },
   { id: "bench", title: "Thủ 3" },
 ];
-
-const getRoleIcon = (role: string) => {
-  switch (role) {
-    case "Leader":
-      return "👑";
-    case "Commander":
-      return "🎖";
-    case "Core":
-      return "⭐";
-    default:
-      return null;
-  }
-};
 
 export function TeamOverviewModal({ isOpen, onClose, membersByColumn }: TeamOverviewModalProps) {
   if (!isOpen) return null;
@@ -67,16 +57,21 @@ export function TeamOverviewModal({ isOpen, onClose, membersByColumn }: TeamOver
                 {teamMembers.length > 0 ? (
                   <div className="space-y-1.5">
                     {teamMembers.map((member) => {
-                      const roleIcon = getRoleIcon(member.role);
+                      const isLeaderMember = hasRole(member.role, "Leader");
+                      
                       return (
                         <div
                           key={member.id}
-                          className="flex items-center justify-between rounded-lg border border-amber-400/10 bg-slate-800/30 px-2.5 py-1.5"
+                          className={`flex items-center justify-between rounded-lg border px-2.5 py-1.5 ${
+                            isLeaderMember
+                              ? `${leaderHighlightClasses.border} ${leaderHighlightClasses.background.replace('/5', '/10')}`
+                              : "border-amber-400/10 bg-slate-800/30"
+                          }`}
                         >
-                          <span className="text-sm text-white">{member.nickname}</span>
-                          {roleIcon && (
-                            <span className="text-xs">{roleIcon}</span>
-                          )}
+                          <span className={`text-sm ${isLeaderMember ? leaderHighlightClasses.name : "text-white"}`}>
+                            {member.nickname}
+                          </span>
+                          <RenderRoleIcons roles={member.role} className="text-xs" />
                         </div>
                       );
                     })}

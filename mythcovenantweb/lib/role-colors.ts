@@ -1,5 +1,5 @@
 // Role color definitions for quick visual identification
-export type RoleType = "Tank" | "DPS" | "Healer" | "Support" | "Member" | "Leader" | "Commander";
+export type RoleType = "Tank" | "DPS" | "Healer" | "Support" | "Member" | "Leader" | "Commander" | "Flex";
 
 export const roleColors: Record<string, { bg: string; text: string; border: string }> = {
   // Main roles with distinct colors
@@ -39,6 +39,11 @@ export const roleColors: Record<string, { bg: string; text: string; border: stri
     text: "text-indigo-300",
     border: "border-indigo-400/20",
   },
+  Flex: {
+    bg: "bg-cyan-500/15",
+    text: "text-cyan-300",
+    border: "border-cyan-400/20",
+  },
 };
 
 // Get role color styles
@@ -50,4 +55,12 @@ export const getRoleColorStyles = (role: string) => {
 export const getRoleBadgeClasses = (role: string) => {
   const colors = getRoleColorStyles(role);
   return `rounded-full border ${colors.border} ${colors.bg} ${colors.text}`;
+};
+
+// Leader highlight styles
+export const leaderHighlightClasses = {
+  border: "border-amber-400",
+  background: "bg-amber-500/5",
+  glow: "shadow-[0_0_20px_rgba(251,191,36,0.3)]",
+  name: "text-amber-300",
 };
