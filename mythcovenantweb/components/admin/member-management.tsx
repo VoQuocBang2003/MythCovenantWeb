@@ -333,7 +333,7 @@ export function MemberManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-[0_0_80px_rgba(0,0,0,0.25)] sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-[2rem] border border-amber-400/20 bg-slate-900/80 p-5 shadow-[0_0_80px_rgba(0,0,0,0.25)] sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.35em] text-amber-200/70">
             Quản lý thành viên

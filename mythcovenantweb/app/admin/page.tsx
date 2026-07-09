@@ -38,7 +38,7 @@ const teams = [
 export default function AdminPage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-amber-400/20 bg-slate-950/70 p-6 shadow-[0_0_80px_rgba(0,0,0,0.3)]">
+<section className="rounded-[2rem] border border-amber-400/20 bg-slate-900/80 p-6 shadow-[0_0_80px_rgba(0,0,0,0.3)]">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">
@@ -75,15 +75,15 @@ export default function AdminPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
+        <div className="rounded-[1.75rem] border border-amber-400/20 bg-slate-900/80 p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-400">Danh sách thành viên</p>
+              <p className="text-sm text-slate-300">Danh sách thành viên</p>
               <h4 className="text-xl font-semibold text-white">
                 Thành viên nổi bật
               </h4>
             </div>
-            <Button variant="outline" className="rounded-full border-white/10 bg-white/5 text-white hover:bg-white/10">
+            <Button variant="outline" className="rounded-full border-amber-400/20 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20">
               Xem tất cả
             </Button>
           </div>
@@ -92,13 +92,13 @@ export default function AdminPage() {
             {members.map((member) => (
               <div
                 key={member.name}
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                className="flex items-center justify-between rounded-2xl border border-amber-400/20 bg-white/5 px-4 py-3 transition hover:border-amber-400/40"
               >
                 <div>
                   <p className="font-medium text-white">{member.name}</p>
-                  <p className="text-sm text-slate-400">{member.role}</p>
+                  <p className="text-sm text-slate-300">{member.role}</p>
                 </div>
-                <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-sm text-emerald-300">
+                <span className="rounded-full border border-emerald-400/30 bg-emerald-400/15 px-3 py-1 text-sm text-emerald-200">
                   {member.status}
                 </span>
               </div>
@@ -106,7 +106,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
+        <div className="rounded-[1.75rem] border border-amber-400/20 bg-slate-900/80 p-5">
           <div className="mb-4 flex items-center gap-2">
             <Activity className="h-5 w-5 text-amber-300" />
             <div>

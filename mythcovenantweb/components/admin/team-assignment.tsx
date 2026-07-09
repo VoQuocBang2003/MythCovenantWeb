@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FileDown, GripVertical, Loader2, Users2, Wifi, WifiOff } from "lucide-react";
+import { FileDown, GripVertical, Loader2, Users2, Wifi, WifiOff, Eye } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 
+import { TeamOverviewModal } from "./team-overview-modal";
 import { useAppFeedback } from "@/components/ui/feedback-provider";
 import { getRoleBadgeClasses } from "@/lib/role-colors";
 import { useNetworkStatus } from "@/hooks/use-network-status";
@@ -59,6 +60,7 @@ export function TeamAssignment() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pendingSync, setPendingSync] = useState(false);
+  const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
   const { toast, confirm } = useAppFeedback();
   const isOnline = useNetworkStatus();
 
@@ -207,8 +209,7 @@ export function TeamAssignment() {
       }
     };
 
-    void loadInitialData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  void loadInitialData();
   }, []);
 
   // Auto-sync when online
@@ -223,7 +224,7 @@ export function TeamAssignment() {
           }
 
           const payload = JSON.parse(pending);
-          const data = await createTeamAssignment({
+          await createTeamAssignment({
             name: payload.name,
             assignments: payload.assignments,
           });
@@ -462,7 +463,7 @@ export function TeamAssignment() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-[0_0_80px_rgba(0,0,0,0.25)]">
+      <div className="rounded-[2rem] border border-amber-400/20 bg-slate-900/80 p-5 shadow-[0_0_80px_rgba(0,0,0,0.25)]">
         <div className="mb-6 grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
           <div>
             <p className="text-sm uppercase tracking-[0.35em] text-amber-200/70">Xếp team</p>
@@ -593,14 +594,28 @@ export function TeamAssignment() {
         ) : null}
       </div>
 
-      <div className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-[0_0_80px_rgba(0,0,0,0.25)]">
-        <p className="text-sm uppercase tracking-[0.35em] text-amber-200/70">Chia Team</p>
-        <h3 className="mt-2 text-2xl font-semibold text-white">
-          Kéo thả thành viên giữa các Team và danh sách chưa xếp
-        </h3>
-        <p className="mt-2 text-sm text-slate-400">
-          Mỗi Team hiển thị số lượng thành viên và tổng power, cùng với danh sách chưa xếp.
-        </p>
+      <div className="rounded-[2rem] border border-amber-400/20 bg-slate-900/80 p-5 shadow-[0_0_80px_rgba(0,0,0,0.25)]">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.35em] text-amber-200/70">Chia Team</p>
+            <h3 className="mt-2 text-2xl font-semibold text-white">
+              Kéo thả thành viên giữa các Team và danh sách chưa xếp
+            </h3>
+            <p className="mt-2 text-sm text-slate-400">
+              Mỗi Team hiển thị số lượng thành viên và tổng power, cùng với danh sách chưa xếp.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsOverviewModalOpen(true)}
+            className="rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-sm text-amber-200 transition hover:bg-amber-500/20"
+          >
+            <span className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Xem tổng quan
+            </span>
+          </button>
+        </div>
       </div>
 
       {isInitializing ? (
@@ -720,6 +735,13 @@ export function TeamAssignment() {
         </section>
       </div>
       )}
+
+      {/* Team Overview Modal */}
+      <TeamOverviewModal
+        isOpen={isOverviewModalOpen}
+        onClose={() => setIsOverviewModalOpen(false)}
+        membersByColumn={membersByColumn}
+      />
     </div>
   );
 }
