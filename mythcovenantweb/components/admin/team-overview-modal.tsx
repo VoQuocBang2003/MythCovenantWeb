@@ -11,12 +11,12 @@ interface TeamOverviewModalProps {
 }
 
 const teamColumns: { id: TeamKey; title: string }[] = [
-  { id: "team-1", title: "Team 1" },
-  { id: "team-2", title: "Team 2" },
-  { id: "team-3", title: "Team 3" },
-  { id: "team-4", title: "Team 4" },
-  { id: "team-5", title: "Team 5" },
-  { id: "bench", title: "Team 6" },
+  { id: "team-1", title: "Công 1" },
+  { id: "team-2", title: "Công 2" },
+  { id: "team-3", title: "Công 3" },
+  { id: "team-4", title: "Thủ 1" },
+  { id: "team-5", title: "Thủ 2" },
+  { id: "bench", title: "Thủ 3" },
 ];
 
 const getRoleIcon = (role: string) => {
