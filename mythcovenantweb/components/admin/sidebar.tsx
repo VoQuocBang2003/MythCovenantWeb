@@ -6,6 +6,7 @@ import {
   Compass,
   LayoutGrid,
   LogOut,
+  Map,
   Settings,
   Shield,
   Users,
@@ -16,6 +17,7 @@ const menuItems = [
   { icon: LayoutGrid, label: "Dashboard", href: "/admin" },
   { icon: Users, label: "Quản lý thành viên", href: "/admin/members" },
   { icon: Compass, label: "Chia Team", href: "/admin/teams" },
+  { icon: Map, label: "Battle Map", href: "/admin/battle-map" },
   { icon: Settings, label: "Cài đặt", href: "/admin/settings" },
 ];
 
@@ -32,11 +34,11 @@ export function AdminSidebar() {
           </div>
           <div>
             <Link
-  href="/"
-  className="inline-block cursor-pointer text-xs uppercase tracking-[0.3em] text-amber-200/70 transition-all duration-200 hover:text-amber-300 hover:scale-105"
->
-  Myth Covenant
-</Link>
+              href="/"
+              className="inline-block cursor-pointer text-xs uppercase tracking-[0.3em] text-amber-200/70 transition-all duration-200 hover:text-amber-300 hover:scale-105"
+            >
+              Myth Covenant
+            </Link>
             <p className="text-sm font-semibold text-white">Control Hall</p>
           </div>
         </div>
